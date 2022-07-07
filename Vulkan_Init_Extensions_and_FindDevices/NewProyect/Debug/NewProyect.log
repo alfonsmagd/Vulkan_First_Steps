@@ -1,0 +1,13 @@
+﻿  VulkanSystemRendererd.cpp
+  main.cpp
+  Generando código...
+main.obj : error LNK2019: símbolo externo _glfwInit sin resolver al que se hace referencia en la función "bool __cdecl initializeWindow(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,int,int)" (?initializeWindow@@YA_NV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@HH@Z)
+main.obj : error LNK2019: símbolo externo _glfwTerminate sin resolver al que se hace referencia en la función "void __cdecl closeWindow(struct GLFWwindow *)" (?closeWindow@@YAXPAUGLFWwindow@@@Z)
+main.obj : error LNK2019: símbolo externo _glfwWindowHint sin resolver al que se hace referencia en la función "bool __cdecl initializeWindow(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,int,int)" (?initializeWindow@@YA_NV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@HH@Z)
+main.obj : error LNK2019: símbolo externo _glfwCreateWindow sin resolver al que se hace referencia en la función "bool __cdecl initializeWindow(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,int,int)" (?initializeWindow@@YA_NV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@HH@Z)
+main.obj : error LNK2019: símbolo externo _glfwDestroyWindow sin resolver al que se hace referencia en la función "void __cdecl closeWindow(struct GLFWwindow *)" (?closeWindow@@YAXPAUGLFWwindow@@@Z)
+main.obj : error LNK2019: símbolo externo _glfwWindowShouldClose sin resolver al que se hace referencia en la función _main
+main.obj : error LNK2019: símbolo externo _glfwPollEvents sin resolver al que se hace referencia en la función _main
+VulkanSystemRendererd.obj : error LNK2019: símbolo externo _glfwGetRequiredInstanceExtensions sin resolver al que se hace referencia en la función "private: void __thiscall VK_Test::VulkanSystemRendered_t::setUpExtensionNames_VkCreateInfo(struct VkInstanceCreateInfo &)" (?setUpExtensionNames_VkCreateInfo@VulkanSystemRendered_t@VK_Test@@AAEXAAUVkInstanceCreateInfo@@@Z)
+C:\Users\alfonso.mateos\source\repos\VulkanCourse\NewProyect\\..\..\..\externals\GLFW\lib-vc2022\glfw3.lib : warning LNK4272: el tipo de máquina de biblioteca 'x64' está en conflicto con el tipo de máquina de destino 'x86'
+C:\Users\alfonso.mateos\source\repos\VulkanCourse\NewProyect\Debug\NewProyect.exe : fatal error LNK1120: 8 externos sin resolver

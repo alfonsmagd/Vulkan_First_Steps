@@ -1,0 +1,4 @@
+﻿  main.cpp
+C:\Users\alfonso.mateos\source\repos\VulkanCourse\NewProyect\VulkanSystemRendererd.h(3,10): fatal error C1083: No se puede abrir el archivo incluir: 'GLFW/glfw3.h': No such file or directory
+  VulkanSystemRendererd.cpp
+C:\Users\alfonso.mateos\source\repos\VulkanCourse\NewProyect\VulkanSystemRendererd.h(3,10): fatal error C1083: No se puede abrir el archivo incluir: 'GLFW/glfw3.h': No such file or directory
