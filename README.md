@@ -1,13 +1,13 @@
-# Vulkan_First_Steps Description
+# Vulkan_First_Steps Description NOT_FINISHED_YET 
 
 
 In this repository you will mainly find how to correctly initialize Vulkan.
 
-- How to check if your computer is compatible with Vulkan API. 
+- How to check if your computer is compatible with Vulkan API. (DONE)
 
-- How to create a window to render and link it with vulkan.
+- How to create a window to render and link it with vulkan.(DONE)
 
-- How to create a instance and generate logical device, physical devices, and VkQueue. 
+- How to create a instance and generate logical device, physical devices, and VkQueue.(DONE) 
 
 # How to compile. 
 
