@@ -1,12 +1,13 @@
 #pragma once
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+#include "Utilites.h"
 #include <iostream>
 #include <vector>
 
 namespace VK_Test {
 
-	using VectExtensions = std::vector<const char*>;
+	
 	class VulkanSystemRendered_t
 	{
 
@@ -32,28 +33,51 @@ namespace VK_Test {
 		GLFWwindow* window = nullptr;
 
 		//Vulkan Components 
-		VkInstance instance;							//Store the instance component;
-		
-		
-		struct {
-			VkPhysicalDevice	physicalDevice;        
-			VkDevice			logicalDevice;
-		}mainDevice;
+		VkInstance instance;							//Store the instance component;	
+		VectExtensions extensionsAviliable;				//Store the exentsions aviliable
+		QueueFamilyIndices indicesQueueFamily;			//Store the indicesQueueFamily its valid and count. 
+		MainDevice mainDevice;							//Store the PhysicalDevice, and logical device. 
+		VkQueue graphicsQueue;							
 
-		//Vulkan Functions.Initialize
+		//////////////////////////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////FUNCTIONS/////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////
+	
+
+		//////////////////////////////////////////////////////////////////////////////////////////////
+		//Vulkan Functions.
+		// -Initialize
 		bool createInstance();
+
+		/// <summary>
+		/// Create logicalDevice to use the interface with physicalDevice. 
+		/// </summary>
+		void createLogicalDevice();
 		
 		//Vulkan get information or devices.
-		
+
 		/// <summary>
 		/// Get gpu device reference. 
 		/// </summary>
 		void getPhysicalDevice();
-
-
+		QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
 		//Vulkan functions supports. 
-		bool chekInstanceExtensionsSupports(VectExtensions* checkExtensions);
-		VectExtensions setUpExtensionNames_VkCreateInfo(VkInstanceCreateInfo* cinfo);
+		bool const chekInstanceExtensionsSupports(VectExtensions* checkExtensions) const;
+		VectExtensions setUpExtensionNames_VkCreateInfo(VkInstanceCreateInfo& cinfo);
+		
+		/// <summary>
+		/// checking if its posible to switch on device to other gpu device.
+		/// </summary>
+		/// <param name="device">Device which will be check.</param>
+		/// <returns>true -> The device is suitable , false-> the device isn´t suitable </returns>
+		bool checkDeviceSuitable(VkPhysicalDevice device) ;
+
+		// --QueueFamilie Indice 
+		
+		
+
 
 	};
 

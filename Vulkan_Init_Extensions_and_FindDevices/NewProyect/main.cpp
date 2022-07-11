@@ -1,9 +1,22 @@
 #include "VulkanSystemRendererd.h"
-
+#include <cstdio>
+#include <windows.h>
+#include <string>
 
 GLFWwindow* window = nullptr;
 
 VK_Test::VulkanSystemRendered_t vulkanRenderedSystem;
+
+
+void initRecordLogs() {
+	using namespace std;
+	//static_cast<void>(freopen("output.log", "w", stdout));
+	//static_cast<void>("error.txt", "w", stderr);
+
+
+}
+
+
 
 bool initializeWindow(std::string nameWindow = "Default", const int Widht = 800, const int Height = 600) {
 	//Initialize GLFW 
@@ -29,8 +42,10 @@ void closeWindow(GLFWwindow* window) {
 }
 int main() {
 
+	//Initialize Logs and recorder data. 
+	initRecordLogs();
 	if (initializeWindow()) {
-
+	
 		//Init VulkanRenderdedSystem 
 		vulkanRenderedSystem.init(window);
 
