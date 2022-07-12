@@ -11,9 +11,9 @@ In this repository you will mainly find how to correctly initialize Vulkan.
 
 - How to create a Validation Layer to debug differents options and trace in Debug Mode ! (DONE) 
 
-# How to compile. 
+# How to compile (In progress) 
 
-
+https://vulkan-tutorial.com/en/Development_environment#page_Windows (How to build and download Vulkan in Windows)
 
 ![vulkan](https://user-images.githubusercontent.com/105669319/177838560-4f14f3a3-90dd-4ca8-ad3d-5f4843da9ace.JPG)
 
