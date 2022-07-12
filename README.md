@@ -9,7 +9,7 @@ In this repository you will mainly find how to correctly initialize Vulkan.
 
 - How to create a instance and generate logical device, physical devices, and VkQueue.(DONE) 
 
-- How to create a Layer to debug differents options and trace in Debug Mode ! (DONE) 
+- How to create a Validation Layer to debug differents options and trace in Debug Mode ! (DONE) 
 
 # How to compile. 
 
