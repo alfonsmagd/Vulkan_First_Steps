@@ -3,7 +3,8 @@
 #include <GLFW/glfw3.h>
 #include "Utilites.h"
 #include <iostream>
-#include <vector>
+#include <Windows.h>
+
 
 namespace VK_Test {
 
@@ -34,11 +35,14 @@ namespace VK_Test {
 
 		//Vulkan Components 
 		VkInstance instance;							//Store the instance component;	
-		VectExtensions extensionsAviliable;				//Store the exentsions aviliable
+		VectExtensions extensionsAvailable;				//Store the exentsions aviliable
 		QueueFamilyIndices indicesQueueFamily;			//Store the indicesQueueFamily its valid and count. 
 		MainDevice mainDevice;							//Store the PhysicalDevice, and logical device. 
 		VkQueue graphicsQueue;							
+		VkDebugUtilsMessengerEXT debugMessenger;        //Store the Debug Utils messenger debug. 
+		const VectExtensions validationLayers = { "VK_LAYER_KHRONOS_validation" }; 
 
+		 
 		//////////////////////////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,6 +51,12 @@ namespace VK_Test {
 	
 
 		//////////////////////////////////////////////////////////////////////////////////////////////
+		/******************STATIC FUNCTIONS**********************************************************/
+		//////////////////////////////////////////////////////////////////////////////////////////////
+		// 
+		
+
+
 		//Vulkan Functions.
 		// -Initialize
 		bool createInstance();
@@ -62,10 +72,11 @@ namespace VK_Test {
 		/// Get gpu device reference. 
 		/// </summary>
 		void getPhysicalDevice();
+		void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 		QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
 		//Vulkan functions supports. 
 		bool const chekInstanceExtensionsSupports(VectExtensions* checkExtensions) const;
-		VectExtensions setUpExtensionNames_VkCreateInfo(VkInstanceCreateInfo& cinfo);
+		VectExtensions setUpExtensionNames_VkCreateInfo();
 		
 		/// <summary>
 		/// checking if its posible to switch on device to other gpu device.
@@ -74,11 +85,24 @@ namespace VK_Test {
 		/// <returns>true -> The device is suitable , false-> the device isn´t suitable </returns>
 		bool checkDeviceSuitable(VkPhysicalDevice device) ;
 
-		// --QueueFamilie Indice 
-		
+		/// <summary>
+		/// Checks if all of the requested layers are available
+		/// </summary>
+		/// <returns>True --> Validation Layer is available . False--> Validation Layer is not available</returns>
+		bool checkValidationLayerSupport();
+
+		void setupDebugMessenger();
 		
 
+		VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
+											  const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+			                                  const VkAllocationCallbacks* pAllocator,
+			                                  VkDebugUtilsMessengerEXT* pDebugMessenger);
 
+		void DestroyDebugUtilsMessengerEXT(VkInstance instance,
+										   VkDebugUtilsMessengerEXT messenger,
+			                               const VkAllocationCallbacks* pAllocator);
+			
 	};
 
 }//end Namespace

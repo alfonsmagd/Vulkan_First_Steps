@@ -2,8 +2,17 @@
 #include <vector>
 
 
+#ifdef NDEBUG
+const bool enableValidationLayers = false;
+#else
+const bool enableValidationLayers = true;
+#endif
+
+
 namespace VK_Test {
 
+	
+	
 	using VectExtensions = std::vector<const char*>;
 
 	typedef struct MainDevice {

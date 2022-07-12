@@ -1,6 +1,5 @@
 #include "VulkanSystemRendererd.h"
 #include <cstdio>
-#include <windows.h>
 #include <string>
 
 GLFWwindow* window = nullptr;
