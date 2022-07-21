@@ -11,6 +11,8 @@ In this repository you will mainly find how to correctly initialize Vulkan.
 
 - How to create a Validation Layer to debug differents options and trace in Debug Mode ! (DONE) 
 
+- How to create a SwapChain and get all information about that. (DONE) and set my surface to render. (DONE)
+
 # How to compile (In progress) 
 
 https://vulkan-tutorial.com/en/Development_environment#page_Windows (How to build and download Vulkan in Windows)
