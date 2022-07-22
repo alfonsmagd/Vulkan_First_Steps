@@ -322,33 +322,48 @@ namespace VK_Test {
 		 //3. Chose SWAP CHAIN MODE. 
 		 VkExtent2D extent2D = chooseSwapExtent(swapchainDetails.surfaceCapabilites);
 
-		 //To choose how many images are in the swap chain . One more that the minimum to allow triple buffering. 
+		 //3.1 To choose how many images are in the swap chain . One more that the minimum to allow triple buffering. 
 		 uint32_t imageCount = swapchainDetails.surfaceCapabilites.minImageCount + 1;
 
-		 //If imageCounter is higher than max, then clamp down to max. 
+		 //3.2 If imageCounter is higher than max, then clamp down to max. 
 		 if (imageCount > swapchainDetails.surfaceCapabilites.maxImageCount && 
 			 swapchainDetails.surfaceCapabilites.minImageCount ) {
 
 			 imageCount = swapchainDetails.surfaceCapabilites.maxImageCount;
 		 }
-		    
-			 //Create Information for Swap chain 
+		 //4. Create Information for Swap chain 
 			 VkSwapchainCreateInfoKHR swapChainInfo{};
-
 			 createSwapChainInfo(bestSurfaceFormat, bestPresentMode, extent2D, swapchainDetails, imageCount, &swapChainInfo);
 
 			 VkResult result =   vkCreateSwapchainKHR(mainDevice.logicalDevice, &swapChainInfo, nullptr, &swapchain);
-
 			 result != VK_SUCCESS ? std::cout << "[VulkanSystemRendered_t::createSwapChain](ERROR)-->Failed to create SwapChain\n" :
-				 std::cout << "[VulkanSystemRendered_t::createSwapChain](INFO)-->SwapChain  was be create with Success\n";
+									std::cout << "[VulkanSystemRendered_t::createSwapChain](INFO)-->SwapChain  was be create with Success\n";
 
-			 //Get Volkan componentes to use after. 
+		  //4.1. Get Volkan componentes to use after. 
 			 if (result == VK_SUCCESS) {
 
 				 swapChainImageFormat = bestSurfaceFormat.format;
 				 swapChainExtent = extent2D;
 
 			 }
+
+		  //5. Get swap chain images, ( first  count , then values)
+
+			 uint32_t swapChainImagesCount;
+
+			 vkGetSwapchainImagesKHR(mainDevice.logicalDevice, swapchain, &swapChainImagesCount, nullptr);
+			 std::vector<VkImage> images(swapChainImagesCount);
+			 vkGetSwapchainImagesKHR(mainDevice.logicalDevice, swapchain, &swapChainImagesCount,&*images.begin());
+
+			 for (const auto& image : images) {
+				 //Store Images Handle 
+				 SwapChainImage swapChainImage{};
+				 swapChainImage.image = image;
+				 swapChainImage.imageView = createImageView(image, swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
+
+				 //Add to swapchainimage in a list.
+				 swapChainImages.push_back(swapChainImage);
+			}
 
 	 }
 
@@ -394,6 +409,40 @@ namespace VK_Test {
 			
 			 //If old swapchain has benn destroyed and new swapchain replaces it , then link old one to quiqcly have responsabilities. 
 			 swapChainInfo->oldSwapchain = VK_NULL_HANDLE;
+	 }
+
+	 VkImageView
+	 VulkanSystemRendered_t::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectflags)
+	 {
+		 std::cout << "[VulkanSystemRendered_t::createImageView](INFO)-->ImageView is Creating........\n";
+
+		 VkImageViewCreateInfo imageViewInfo{};
+		 imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		 imageViewInfo.image = image;												//Image to create view for. 
+		 imageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;							//Type of image ( 1D,2D,CUBE)
+		 imageViewInfo.format = format;												//Format of image Data. 
+		 imageViewInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;				
+		 imageViewInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+		 imageViewInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+		 imageViewInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+		 
+		 //SobreSource allow the view only a part of an image. 
+		 imageViewInfo.subresourceRange.aspectMask = aspectflags;					//Which aspect of image to view
+		 imageViewInfo.subresourceRange.baseMipLevel = 0;							//Start base mipmap leve to view from 
+		 imageViewInfo.subresourceRange.baseArrayLayer = 0;							//Start array level to view from 
+		 imageViewInfo.subresourceRange.layerCount = 1;								//Number of array levels to view
+		 imageViewInfo.subresourceRange.levelCount = 1;								//is the number of mipmap levels (starting from baseMipLevel) accessible to the view
+
+		 //Create ImageView and return it 
+
+		 VkImageView imageView{};
+
+		 VkResult result = vkCreateImageView(mainDevice.logicalDevice, &imageViewInfo, nullptr, &imageView);
+		
+		 result != VK_SUCCESS ? std::cout << "[VulkanSystemRendered_t::createImageView](ERROR)-->Failed to create ImageView\n" :
+			 std::cout << "[VulkanSystemRendered_t::createImageView](INFO)-->ImageView was be create with Success\n";
+
+		 return imageView;
 	 }
 
 	 void 
@@ -479,6 +528,11 @@ namespace VK_Test {
 	const void 
 	VulkanSystemRendered_t::cleanAll()
 	{
+		for (auto image : swapChainImages) {
+
+			vkDestroyImageView(mainDevice.logicalDevice,image.imageView, nullptr);
+		}
+
 		if (enableValidationLayers) {
 			DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
 		}
@@ -591,7 +645,8 @@ namespace VK_Test {
 
 	}
 
-	void VulkanSystemRendered_t::createSurface()
+	void
+	VulkanSystemRendered_t::createSurface()
 	{
 		//Create Surface, This return info struct , return results VkResutls.  
 		VkResult result =  glfwCreateWindowSurface(instance, window, nullptr, &surface);
