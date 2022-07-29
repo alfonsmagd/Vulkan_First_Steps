@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
-
+#include <string>
+#include <fstream>
+#include <iostream>
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -23,6 +25,7 @@ namespace VK_Test {
 		VkPhysicalDevice	physicalDevice;
 		VkDevice			logicalDevice;
 	};
+
 	struct QueueFamilyIndices {
 
 		//-Constructor
@@ -42,6 +45,7 @@ namespace VK_Test {
 		}
 
 	};//end queuefamiliesIndices. 
+
 	struct SwapChainDetails {
 		VkSurfaceCapabilitiesKHR surfaceCapabilites;	// Surface properties,e.g. image size/extends 
 		std::vector<VkSurfaceFormatKHR> formats;		// Surface image formats , erg rgba and size of each color. 
@@ -53,6 +57,29 @@ namespace VK_Test {
      	VkImageView imageView;
 	};
 
+	static std::vector<char> readFromFile(const std::string& filename) {
 
+		// Open stream from given filename
+		//std::ios::binary , tells stream to read filename  as binary.
+		//std::ios::ate	   , tells stream to start reading from end file 
+		std::ifstream file(filename, std::ios::binary | std::ios::ate);
+
+		if (!file.is_open()) {
+			std::cout << "[readFromFile]:(ERROR)cant open the file.\n";
+		}
+		//store the size to create a vector with same size that file. 
+		//Get current read position and use 
+		size_t fileSize = static_cast<size_t>(file.tellg());
+		std::vector<char> fileBuffer(fileSize);
+
+		//move the start of the file.
+		file.seekg(0);
+		file.read(&fileBuffer[0], fileSize);
+		file.close();
+
+		return fileBuffer;
+
+
+	}
 
 }//end namespace 

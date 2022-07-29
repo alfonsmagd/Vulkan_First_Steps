@@ -6,6 +6,7 @@
 #include <Windows.h>
 #include "Utilites.h"
 #include <iostream>
+#include <array>
 #include <algorithm>
 #include <optional>
 #include <limits>
@@ -42,17 +43,20 @@ namespace VK_Test {
 		GLFWwindow* window = nullptr;
 
 		//Vulkan Components 
+		VkPipeline graphicsPipeline;
+		VkPipelineLayout pipelineLayout; 
+		VkRenderPass renderPass;						
 		VkInstance instance;							//Store the instance component;	
 		VectExtensions extensionsAvailable;				//Store the exentsions aviliable
 		QueueFamilyIndices indicesQueueFamily;			//Store the indicesQueueFamily its valid and count. 
 		MainDevice mainDevice;							//Store the PhysicalDevice, and logical device. 
-		VkQueue graphicsQueue;
+		VkQueue graphicsQueue;							//Store the graphics Queue. 
 		VkQueue presentationQueue;
 		VkDebugUtilsMessengerEXT debugMessenger;        //Store the Debug Utils messenger debug. 
 		const VectExtensions validationLayers = { "VK_LAYER_KHRONOS_validation" };
 		VkSurfaceKHR surface;							//Store surface when images will be render. 
 		VkSwapchainKHR swapchain;
-		std::vector<SwapChainImage> swapChainImages;    //Vector to store swapChain images. 
+		std::vector<SwapChainImage> swapChainImages;    //Vector to store swapChain images.
 
 		//-Utilites Components.
 		VkFormat swapChainImageFormat;
@@ -63,7 +67,6 @@ namespace VK_Test {
 		//////////////////////////////////////////////////////////////////////////////////////////////
 		////////////////////////FUNCTIONS/////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////////////
-
 
 		//////////////////////////////////////////////////////////////////////////////////////////////
 		/******************STATIC FUNCTIONS**********************************************************/
@@ -122,7 +125,18 @@ namespace VK_Test {
 		/// <param name="flags"></param>
 		/// <returns></returns>
 		VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectflags);
-
+		/// <summary>
+		/// 
+		/// </summary>
+		void createGraphicsPipeLine();
+		/// <summary>
+		/// This render pass need to tell Vulkan about the framebuffer attachments that will be used while rendering. 
+		 // We need to specify how many color and depth buffers there will be, 
+		 // how many samples to use for each of them and how their contents should be handled throughout the rendering operations. 
+		 //All of this information is wrapped in a render pass object,
+		/// </summary>
+		void createRenderPass();
+		VkShaderModule createShaderModule(const std::vector<char>& code);
 
 		//Vulkan get information or devices.
 
@@ -164,8 +178,7 @@ namespace VK_Test {
 
 		//--Getter Vulkan functions. 
 
-		auto
-			getSwapChainDetails(VkPhysicalDevice device);
+		auto getSwapChainDetails(VkPhysicalDevice device);
 		/// <summary>
 		/// Choose the best surfaceFormatKHR 
 		/// Choose always format:		VK_FORMAT_R8G8B8A8_UNORM
