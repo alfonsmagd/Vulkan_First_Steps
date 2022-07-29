@@ -1,7 +1,11 @@
 # Vulkan_First_Steps Description NOT_FINISHED_YET 
 
 
-In this repository you will mainly find how to correctly initialize Vulkan.
+In this repository you will mainly find how to correctly initialize Vulkan. Also you can check the explanations. 
+
+https://vulkan-tutorial.com/
+
+Be carefull my code include modifications that original code, and improve some techniques using c++17. 
 
 - How to check if your computer is compatible with Vulkan API. (DONE)
 
@@ -12,6 +16,8 @@ In this repository you will mainly find how to correctly initialize Vulkan.
 - How to create a Validation Layer to debug differents options and trace in Debug Mode ! (DONE) 
 
 - How to create a SwapChain and get all information about that. (DONE) and set my surface to render. (DONE)
+
+- Graphics Pipeline basics building. Differentes depdencencies (DONE). 
 
 # How to compile (In progress) 
 
