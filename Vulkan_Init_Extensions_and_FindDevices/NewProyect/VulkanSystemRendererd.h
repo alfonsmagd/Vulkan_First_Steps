@@ -56,11 +56,18 @@ namespace VK_Test {
 		const VectExtensions validationLayers = { "VK_LAYER_KHRONOS_validation" };
 		VkSurfaceKHR surface;							//Store surface when images will be render. 
 		VkSwapchainKHR swapchain;
+		
+		//--Vector Components buffer process. 
+		std::vector<VkFramebuffer> swapChainFramebuffers; //Vecto to store framebuffer images 
 		std::vector<SwapChainImage> swapChainImages;    //Vector to store swapChain images.
+		std::vector<VkCommandBuffer> commandBuffers;    //Vector to store command buffers 
 
 		//-Utilites Components.
 		VkFormat swapChainImageFormat;
 		VkExtent2D swapChainExtent;
+
+		//-Pools
+		VkCommandPool commandPool;
 
 		//////////////////////////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,11 +85,20 @@ namespace VK_Test {
 		//Vulkan Functions.
 		// -Initialize and create functions
 
-			/// <summary>
+		void createCommandBuffer();
+		/// <summary>
+		/// 
+		/// </summary>
+		void createCommandPool();
+		/// <summary>
 			/// 
 			/// </summary>
 			/// <returns></returns>
 		bool createInstance();
+		/// <summary>
+		/// 
+		/// </summary>
+		void createFramebuffers();
 		/// <summary>
 		/// Create logicalDevice to use the interface with physicalDevice. 
 		/// </summary>
@@ -137,6 +153,16 @@ namespace VK_Test {
 		/// </summary>
 		void createRenderPass();
 		VkShaderModule createShaderModule(const std::vector<char>& code);
+
+		//--Record Functions. 
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		void recordCommands();
+
+
+
 
 		//Vulkan get information or devices.
 
@@ -209,7 +235,7 @@ namespace VK_Test {
 		void DestroyDebugUtilsMessengerEXT(VkInstance instance,
 			VkDebugUtilsMessengerEXT messenger,
 			const VkAllocationCallbacks* pAllocator);
-
+		void cleanFrameBuffers(std::vector<VkFramebuffer>* frameBuffers);
 	};
 
 }//end Namespace
