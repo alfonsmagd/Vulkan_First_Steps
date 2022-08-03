@@ -19,9 +19,13 @@ Be carefull my code include modifications that original code, and improve some t
 
 - Graphics Pipeline basics building. Differentes depdencencies (DONE). 
 
+- Renderer and drawing in the screen , shader and vertex. (DONE) 
+![Captura](https://user-images.githubusercontent.com/105669319/182641298-97edeff8-bdf1-4724-b394-4214030e066c.JPG)
+
 # How to compile (In progress) 
 
 https://vulkan-tutorial.com/en/Development_environment#page_Windows (How to build and download Vulkan in Windows)
+
 
 ![vulkan](https://user-images.githubusercontent.com/105669319/177838560-4f14f3a3-90dd-4ca8-ad3d-5f4843da9ace.JPG)
 
