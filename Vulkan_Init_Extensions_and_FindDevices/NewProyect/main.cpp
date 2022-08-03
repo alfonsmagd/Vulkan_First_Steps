@@ -17,7 +17,7 @@ void initRecordLogs() {
 
 
 
-bool initializeWindow(std::string nameWindow = "Default", const int Widht = 800, const int Height = 600) {
+bool initializeWindow(std::string nameWindow = "Default", const int Widht = 1080, const int Height = 720) {
 	//Initialize GLFW 
 	if (glfwInit()) {
 		//Not to work with OpenGL disabled the context. 
@@ -51,6 +51,7 @@ int main() {
 		while (!glfwWindowShouldClose(window)) {
 
 			glfwPollEvents();
+			vulkanRenderedSystem.draw();
 
 		}//end while
 

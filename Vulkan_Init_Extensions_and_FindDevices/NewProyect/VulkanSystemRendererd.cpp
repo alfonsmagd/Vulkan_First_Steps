@@ -249,7 +249,42 @@ namespace VK_Test {
 		 
 	 }
 
-	 void VulkanSystemRendered_t::createCommandBuffer()
+	 void 
+	 VulkanSystemRendered_t::createSynchronization()
+	 {
+
+		 imageAvailable.resize(MAX_FRAME_DRAWS);
+		 renderFinished.resize(MAX_FRAME_DRAWS);
+		 drawFences.resize(MAX_FRAME_DRAWS);
+
+		 //Semaforo creation information 
+		 VkSemaphoreCreateInfo semaphroeCreateInfo{};
+		 semaphroeCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+		 //Fence creation information.
+		 VkFenceCreateInfo fenceCreateInfo{};
+		 fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+		 fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+		 for (size_t i = 0; i < MAX_FRAME_DRAWS; i++) {
+			 VkResult result = vkCreateSemaphore(mainDevice.logicalDevice, &semaphroeCreateInfo, nullptr, &imageAvailable[i]);
+
+			 result != VK_SUCCESS ? std::cout << "[VulkanSystemRendered_t::createSynchronization](ERROR)-->Creating Semaphore (imageAvailable "<<i<<")  FAIL" << std::endl :
+				 std::cout << "[VulkanSystemRendered_t::createSynchronization](INFO)-->Creating Semaphore (imageAvailable " << i <<")  SUCCESS" << std::endl;
+
+			 result = vkCreateSemaphore(mainDevice.logicalDevice, &semaphroeCreateInfo, nullptr, &renderFinished[i]);
+
+			 result != VK_SUCCESS ? std::cout << "[VulkanSystemRendered_t::createSynchronization](ERROR)-->Creating Semaphore (renderFinished " << i << ")  FAIL" << std::endl :
+				 std::cout << "[VulkanSystemRendered_t::createSynchronization](INFO)-->Creating Semaphore (renderFinished " << i << ")  SUCCESS" << std::endl;
+
+			 result = vkCreateFence(mainDevice.logicalDevice, &fenceCreateInfo, nullptr, &drawFences[i]);
+			 result != VK_SUCCESS ? std::cout << "[VulkanSystemRendered_t::createSynchronization](ERROR)-->Creating Fence"  << i <<  " FAIL" << std::endl :
+				 std::cout << "[VulkanSystemRendered_t::createSynchronization](INFO)-->Creating Fence"  << i << "  SUCCESS" << std::endl;
+			}
+		 }
+
+	 void
+	 VulkanSystemRendered_t::createCommandBuffer()
 	 {
 		 commandBuffers.resize(swapChainFramebuffers.size());
 
@@ -534,7 +569,7 @@ namespace VK_Test {
 		 viewportStateCreateInfo.scissorCount = 1;
 		 viewportStateCreateInfo.pScissors = &scissor;
 
-
+		 
 		 // -- DYNAMIC STATES --
 		 // Dynamic states to enable
 		 //std::vector<VkDynamicState> dynamicStateEnables;
@@ -755,7 +790,7 @@ namespace VK_Test {
 		 renderPassBeginInfo.renderArea.offset = { 0,0 };
 		 renderPassBeginInfo.renderArea.extent = swapChainExtent;
 		 VkClearValue clearValue[] = {
-			 {0.6f,0.6f,0.4,1.0f}
+			 {0.1f,0.1f,0.2f,1.0f}
 		 };
 		 renderPassBeginInfo.pClearValues = clearValue;
 		 renderPassBeginInfo.clearValueCount = 1;
@@ -776,6 +811,17 @@ namespace VK_Test {
 			 //Bind pipeline to be used in render pass 
 			 vkCmdBindPipeline(cmbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
+			 /*To use dynamics states its need to enable in pipeline
+			 VkViewport viewport{};
+			 viewport.x = 1.0f;
+			 viewport.y = 0.0f;
+			 viewport.width = (float)swapChainExtent.width;
+			 viewport.height = (float)swapChainExtent.height;
+			 viewport.minDepth = 0.0f;
+			 viewport.maxDepth = 1.0f;
+			 vkCmdSetViewport(cmbuffer, 0, 1, &viewport);*/
+
+			 //Draw 
 			 vkCmdDraw(cmbuffer, 3, 1, 0, 0);
 
 			 //End RenderPass 
@@ -876,6 +922,7 @@ namespace VK_Test {
 				createCommandPool();
 				createCommandBuffer();
 				recordCommands();
+				createSynchronization();
 
 				std::cout << "[VulkanSystemRendered_t::init](INFO)-->Vulkan is SUCCES" << std::endl;
 			}
@@ -885,10 +932,59 @@ namespace VK_Test {
 		}
 	}
 
+	void
+	VulkanSystemRendered_t::draw()
+	{
+		
+		//1. Get next available image to draw and set something to signal when we´re finished with the image (e.g semaphore)
+		uint32_t aux_indeximage;
+		vkAcquireNextImageKHR(mainDevice.logicalDevice, swapchain, std::numeric_limits<uint64_t>::max(), imageAvailable[currentFrame], VK_NULL_HANDLE, &aux_indeximage);
+		vkWaitForFences(mainDevice.logicalDevice, 1, &drawFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
+		//Reset Fences Manually reset. 
+		vkResetFences(mainDevice.logicalDevice, 1, &drawFences[currentFrame]);
+
+		//2.  -- SUBMIT COMMAND BUFFER TO RENDER --
+		VkSubmitInfo submitInfo{};
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+		submitInfo.waitSemaphoreCount = 1;
+		submitInfo.pWaitSemaphores = &imageAvailable[currentFrame];
+		submitInfo.pWaitDstStageMask = waitStages;
+		submitInfo.commandBufferCount = 1;
+		submitInfo.signalSemaphoreCount = 1;									// Number of semaphores to signal
+		submitInfo.pCommandBuffers = &commandBuffers[aux_indeximage];
+		submitInfo.pSignalSemaphores = &renderFinished[currentFrame];
+
+		VkResult result = vkQueueSubmit(graphicsQueue, 1, &submitInfo, drawFences[currentFrame]);
+		//3. Present Images to screen when it has signaled finished rendering.  
+
+		VkPresentInfoKHR presentInfo = {};
+		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+		presentInfo.waitSemaphoreCount = 1;										// Number of semaphores to wait on
+		presentInfo.pWaitSemaphores = &renderFinished[currentFrame];			// Semaphores to wait on
+		presentInfo.swapchainCount = 1;											// Number of swapchains to present to
+		presentInfo.pSwapchains = &swapchain;									// Swapchains to present images to
+		presentInfo.pImageIndices = &aux_indeximage;							// Index of images in swapchains to present
+
+		result = vkQueuePresentKHR(presentationQueue, &presentInfo);
+
+		//Update currentFrame. 
+		currentFrame = (currentFrame + 1) % MAX_FRAME_DRAWS;
+		
+	}
+
 	
 	const void 
 	VulkanSystemRendered_t::cleanAll()
 	{
+		//Wait until no actions being run on device before destroying. 
+		vkDeviceWaitIdle(mainDevice.logicalDevice);
+		//Clean Semaphores and Fence vectors. 
+		for (size_t i = 0; i < MAX_FRAME_DRAWS; i++) {
+			vkDestroySemaphore(mainDevice.logicalDevice, imageAvailable[i], nullptr);
+			vkDestroySemaphore(mainDevice.logicalDevice, renderFinished[i], nullptr);
+			vkDestroyFence(mainDevice.logicalDevice, drawFences[i], nullptr);
+		}
 		vkDestroyCommandPool(mainDevice.logicalDevice, commandPool, nullptr);
 		cleanFrameBuffers(&swapChainFramebuffers);
 		vkDestroyPipeline(mainDevice.logicalDevice, graphicsPipeline, nullptr);

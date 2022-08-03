@@ -14,9 +14,11 @@ const bool enableValidationLayers = true;
 namespace VK_Test {
 
 	
-	
+	//--Using definitions--//
 	using VectExtensions = std::vector<const char*>;
-
+	
+	//--Const--//
+	const int MAX_FRAME_DRAWS = 2;
 	const VectExtensions deviceExtensions = {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};

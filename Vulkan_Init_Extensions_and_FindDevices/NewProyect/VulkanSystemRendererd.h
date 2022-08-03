@@ -33,6 +33,10 @@ namespace VK_Test {
 		/// <returns>A message in console. about the succes or fail.</returns>
 		void init(GLFWwindow* newWindow) noexcept;
 		/// <summary>
+		/// Draw process renderer. 
+		/// </summary>
+		void draw();
+		/// <summary>
 		/// Destroy vulkan instance. 
 		/// </summary>
 		/// <returns></returns>
@@ -41,7 +45,7 @@ namespace VK_Test {
 	private:
 		//Variables Ptr
 		GLFWwindow* window = nullptr;
-
+		int currentFrame{ 0 };
 		//Vulkan Components 
 		VkPipeline graphicsPipeline;
 		VkPipelineLayout pipelineLayout; 
@@ -69,6 +73,11 @@ namespace VK_Test {
 		//-Pools
 		VkCommandPool commandPool;
 
+		//-Syncrhonyze 
+		std::vector<VkSemaphore> imageAvailable;
+		std::vector<VkSemaphore> renderFinished;
+		std::vector<VkFence> drawFences;
+
 		//////////////////////////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,6 +94,8 @@ namespace VK_Test {
 		//Vulkan Functions.
 		// -Initialize and create functions
 
+
+		void createSynchronization();
 		void createCommandBuffer();
 		/// <summary>
 		/// 
