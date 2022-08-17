@@ -19,6 +19,8 @@ Be carefull my code include modifications that original code, and improve some t
 
 - Graphics Pipeline basics building. Differentes depdencencies (DONE). 
 
+- How to implement a Vertex Buffer. 
+
 - Renderer and drawing in the screen , shader and vertex. (DONE) 
 ![Captura](https://user-images.githubusercontent.com/105669319/182641298-97edeff8-bdf1-4724-b394-4214030e066c.JPG)
 
