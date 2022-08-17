@@ -28,6 +28,8 @@ Be carefull my code include modifications that original code, and improve some t
 
 https://vulkan-tutorial.com/en/Development_environment#page_Windows (How to build and download Vulkan in Windows)
 
+![Captura](https://user-images.githubusercontent.com/105669319/185169802-873f5725-623e-4de0-81df-03a168ae69b5.JPG)
+
 
 ![vulkan](https://user-images.githubusercontent.com/105669319/177838560-4f14f3a3-90dd-4ca8-ad3d-5f4843da9ace.JPG)
 
