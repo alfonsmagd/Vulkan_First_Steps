@@ -299,8 +299,6 @@ namespace VK_Test {
 		 result != VK_SUCCESS ? std::cout << "[VulkanSystemRendered_t::createCommandBuffer](ERROR)-->Failed to create allocate command buffer\n" :
 			 std::cout << "[VulkanSystemRendered_t::createCommandBuffer](INFO)-->Allocate Command buffer was be create with Success\n";
 
-
-
 	 }
 
 	 bool 
@@ -526,19 +524,53 @@ namespace VK_Test {
 		 fragmentShaderCreateInfo.module = fragmentShaderModule;						// Shader module to be used by stage
 		 fragmentShaderCreateInfo.pName = "main";									// Entry point in to shader
 
+		 
 		 // Put shader stage creation info in to array
 		 // Graphics Pipeline creation info requires array of shader stage creates
 		 VkPipelineShaderStageCreateInfo shaderStages[] = { vertexShaderCreateInfo, fragmentShaderCreateInfo };
 
+		 //How the data for a single vertex (include info such as position,texture,colour,ect ) is as a whole. 
+		 VkVertexInputBindingDescription  bindingDescription{};
+		 bindingDescription.binding = 0;										//	Can bind multiple stream of data, this defines which one. 
+		 bindingDescription.stride = sizeof(Vertex);							// Size of a single vertex. 
+		 bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;			// Move on the next vertex. 
+		 
+		 // How the data for an attribute is defined within a vertex
+		 std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions;
 
-		 // -- VERTEX INPUT (TODO: Put in vertex descriptions when resources created) --
+		 // Position Attribute
+		 attributeDescriptions[0].binding = 0;							// Which binding the data is at (should be same as above)
+		 attributeDescriptions[0].location = 0;							// Location in shader where data will be read from
+		 attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;	// Format the data will take (also helps define size of data)
+		 attributeDescriptions[0].offset = offsetof(Vertex, pos);		// Where this attribute is defined in the data for a single vertex
+
+		 // Colour Attribute
+		 attributeDescriptions[1].binding = 0;
+		 attributeDescriptions[1].location = 1;
+		 attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+		 attributeDescriptions[1].offset = offsetof(Vertex, col);
+
+		 // -- VERTEX INPUT --
 		 VkPipelineVertexInputStateCreateInfo vertexInputCreateInfo = {};
 		 vertexInputCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		 vertexInputCreateInfo.vertexBindingDescriptionCount = 0;
-		 vertexInputCreateInfo.pVertexBindingDescriptions = nullptr;			// List of Vertex Binding Descriptions (data spacing/stride information)
-		 vertexInputCreateInfo.vertexAttributeDescriptionCount = 0;
-		 vertexInputCreateInfo.pVertexAttributeDescriptions = nullptr;		// List of Vertex Attribute Descriptions (data format and where to bind to/from)
+		 vertexInputCreateInfo.vertexBindingDescriptionCount = 1;
+		 vertexInputCreateInfo.pVertexBindingDescriptions = &bindingDescription;											// List of Vertex Binding Descriptions (data spacing/stride information)
+		 vertexInputCreateInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+		 vertexInputCreateInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
+
+
+
+
+		 // -- VERTEX INPUT (TODO: Put in vertex descriptions when resources created) --
+		 /*
+		 VkPipelineVertexInputStateCreateInfo vertexInputCreateInfo = {};
+		 vertexInputCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+		 vertexInputCreateInfo.vertexBindingDescriptionCount = 1;
+		 vertexInputCreateInfo.pVertexBindingDescriptions = &bindingDescription;			// List of Vertex Binding Descriptions (data spacing/stride information)
+		 vertexInputCreateInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+		 vertexInputCreateInfo.pVertexAttributeDescriptions = attributeDescriptions.data();		// List of Vertex Attribute Descriptions (data format and where to bind to/from)
+		 */
 
 		 // -- INPUT ASSEMBLY --
 		 VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
@@ -675,7 +707,7 @@ namespace VK_Test {
 
 		 // Create Graphics Pipeline
 		 
-		 result = vkCreateGraphicsPipelines(mainDevice.logicalDevice, nullptr, 1, &pipelineCreateInfo, nullptr, &graphicsPipeline);
+		 result = vkCreateGraphicsPipelines(mainDevice.logicalDevice, nullptr, 1, &pipelineCreateInfo, nullptr, &*graphicsPipeline);
 
 		 // Destroy Shader Modules, no longer needed after Pipeline created
 		 vkDestroyShaderModule(mainDevice.logicalDevice, fragmentShaderModule, nullptr);
@@ -809,7 +841,13 @@ namespace VK_Test {
 			 vkCmdBeginRenderPass(cmbuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);			// The render pass commands will be embedded in the primary command buffer itself and no secondary command buffers will be executed.
 
 			 //Bind pipeline to be used in render pass 
-			 vkCmdBindPipeline(cmbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+			 vkCmdBindPipeline(cmbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,*graphicsPipeline);
+
+
+			 VkBuffer vertexBuffer[] = { firstMesh.getVertexBuffer() };
+			 VkDeviceSize offsets[] = { 0 };
+			 vkCmdBindVertexBuffers(cmbuffer, 0, 1, vertexBuffer, offsets);
+
 
 			 /*To use dynamics states its need to enable in pipeline
 			 VkViewport viewport{};
@@ -822,7 +860,7 @@ namespace VK_Test {
 			 vkCmdSetViewport(cmbuffer, 0, 1, &viewport);*/
 
 			 //Draw 
-			 vkCmdDraw(cmbuffer, 3, 1, 0, 0);
+			 vkCmdDraw(cmbuffer, static_cast<uint32_t>(firstMesh.gentVertexCount()), 1, 0, 0);
 
 			 //End RenderPass 
 			 vkCmdEndRenderPass(cmbuffer);
@@ -834,6 +872,7 @@ namespace VK_Test {
 			
 			 index_frame++;
 		 };
+
 		 std::for_each(commandBuffers.begin(), commandBuffers.end(), StartRecording);
 	 }
 
@@ -915,8 +954,26 @@ namespace VK_Test {
 				createSurface();
 				getPhysicalDevice();
 				createLogicalDevice();
+				//Create a Mesh 
+				std::vector<Vertex> verticesAux;
+				std::vector<Vertex> meshVertices{
+					{{0.0, -0.4, 0.0}},
+					{{0.4, 0.1, 0.0}},
+					{{-0.4,0.6,0.0}}
+				};
+				 std::vector<Vertex> vertices = {
+					{{0.0f, -0.5f, 0.0}, {1.0f, 0.5f, 0.0f}},
+					{{0.5f, 0.5f,0.0}, {0.0f, 1.0f, 0.0f}},
+					{{-0.5f, 0.5f,0.0}, {0.0f, 0.0f, 1.0f}}
+				};
+
+				 
+				
+				 MeshPatterns::sierpinski(&verticesAux, 11, { 0.0, -0.8, 0.0 }, { 0.8, 0.8, 0.0 }, { -0.8,0.8,0.0 });
+
 				createSwapChain();
 				createRenderPass();
+				firstMesh = Mesh(mainDevice.physicalDevice, mainDevice.logicalDevice, &verticesAux);
 				createGraphicsPipeLine();
 				createFramebuffers();
 				createCommandPool();
@@ -979,6 +1036,8 @@ namespace VK_Test {
 	{
 		//Wait until no actions being run on device before destroying. 
 		vkDeviceWaitIdle(mainDevice.logicalDevice);
+
+		firstMesh.DestroyVertexBuffer();
 		//Clean Semaphores and Fence vectors. 
 		for (size_t i = 0; i < MAX_FRAME_DRAWS; i++) {
 			vkDestroySemaphore(mainDevice.logicalDevice, imageAvailable[i], nullptr);
@@ -987,7 +1046,7 @@ namespace VK_Test {
 		}
 		vkDestroyCommandPool(mainDevice.logicalDevice, commandPool, nullptr);
 		cleanFrameBuffers(&swapChainFramebuffers);
-		vkDestroyPipeline(mainDevice.logicalDevice, graphicsPipeline, nullptr);
+		vkDestroyPipeline(mainDevice.logicalDevice, *graphicsPipeline, nullptr);
 		vkDestroyPipelineLayout(mainDevice.logicalDevice, pipelineLayout, nullptr);
 		vkDestroyRenderPass(mainDevice.logicalDevice, renderPass, nullptr);
 		for (auto image : swapChainImages) {

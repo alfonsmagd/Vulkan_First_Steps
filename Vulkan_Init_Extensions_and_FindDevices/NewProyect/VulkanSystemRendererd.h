@@ -5,6 +5,8 @@
 #include <GLFW/glfw3.h>
 #include <Windows.h>
 #include "Utilites.h"
+#include "Mesh.h"
+#include "MeshPatterns.h"
 #include <iostream>
 #include <array>
 #include <algorithm>
@@ -47,7 +49,9 @@ namespace VK_Test {
 		GLFWwindow* window = nullptr;
 		int currentFrame{ 0 };
 		//Vulkan Components 
-		VkPipeline graphicsPipeline;
+		Mesh firstMesh;
+
+		std::unique_ptr<VkPipeline> graphicsPipeline = std::make_unique<VkPipeline>();
 		VkPipelineLayout pipelineLayout; 
 		VkRenderPass renderPass;						
 		VkInstance instance;							//Store the instance component;	

@@ -3,6 +3,8 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <glm/glm.hpp>
+#include <vulkan/vulkan_core.h>
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -16,6 +18,7 @@ namespace VK_Test {
 	
 	//--Using definitions--//
 	using VectExtensions = std::vector<const char*>;
+	using ArrayVertex = std::array<VkVertexInputAttributeDescription, 1>;
 	
 	//--Const--//
 	const int MAX_FRAME_DRAWS = 2;
@@ -83,5 +86,11 @@ namespace VK_Test {
 
 
 	}
+
+	struct Vertex {
+
+		glm::vec3 pos;
+		glm::vec3 col;
+	};
 
 }//end namespace 
